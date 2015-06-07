@@ -12,7 +12,7 @@
 	
 	
 	<name>Firefly MQTT - Shed some light on what's going on!</name>
-	<url></url>
+	<url>https://github.com/darugnaa/firefly-mqtt/</url>
 
 	<properties>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
