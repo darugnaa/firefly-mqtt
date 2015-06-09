@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.Box;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Component;
 import java.io.IOException;
@@ -68,8 +69,12 @@ public class MainWindow {
 	private TopicAutodiscover m_topicAutodiscover;
 	
 	private JFrame frmFireflyMqtt;
+	private JPanel panel_r;
+	private JButton btnTopicAutodiscover;
+	private JButton btnSubscribe;
 	private JTextField textFieldAddress;
 	private JTextField txtSubscribe;
+	private JList topicListReference;
 	private JTable table;
 	private JTextField textFieldPort;
 
@@ -116,8 +121,7 @@ public class MainWindow {
 		        //m_client.connectWithResult(connOpts);
 		        //m_client.subscribe("owntracks/#");
 		        source.setText("Disconnect");
-		        textFieldAddress.setEnabled(false);
-		        textFieldPort.setEnabled(false);
+		        setEnabledOnComponentsThatRequireToBeconnected(true);
 		        s_logger.info("Connected");
 			} catch (MqttException e) {
 				s_logger.error("Problem during connection", e);
@@ -134,8 +138,7 @@ public class MainWindow {
 					m_client = null;
 					s_logger.info("Disconnected");
 					source.setText("Connect");
-					textFieldAddress.setEnabled(true);
-			        textFieldPort.setEnabled(true);
+					setEnabledOnComponentsThatRequireToBeconnected(false);
 				} catch (MqttException e) {
 					s_logger.error("Disconnect error", e);
 				}
@@ -143,6 +146,13 @@ public class MainWindow {
 		}
 	}
 	
+	private void setEnabledOnComponentsThatRequireToBeconnected(boolean connected) {
+        textFieldAddress.setEnabled(!connected);
+        textFieldPort.setEnabled(!connected);
+        btnSubscribe.setEnabled(connected);
+        btnTopicAutodiscover.setEnabled(connected);
+        topicListReference.setEnabled(connected);
+	}
 	
 	private boolean subscribeAndUpdateGui(String topic) {
 		boolean subscribedOk = false;
@@ -214,6 +224,8 @@ public class MainWindow {
 			JCheckBox checkbox = new JCheckBox(topic, SubscriptionSettings.getSettings().isSubscribedTo(topic));
 			m_topicAutodiscover.getListModel().addElement(checkbox);
 		}
+		// Not connected when starting up
+		setEnabledOnComponentsThatRequireToBeconnected(false);
 	}
 
 	/**
@@ -270,7 +282,7 @@ public class MainWindow {
 		});
 		panel.add(btnClearTable);
 		
-		JPanel panel_r = new JPanel();
+		panel_r = new JPanel();
 		frmFireflyMqtt.getContentPane().add(panel_r, BorderLayout.EAST);
 		
 		Box verticalBox = Box.createVerticalBox();
@@ -282,7 +294,8 @@ public class MainWindow {
 		txtSubscribe.setText("Subscribe");
 		txtSubscribe.setColumns(10);
 		
-		JButton btnSubscribe = new JButton("Subscribe");
+		btnSubscribe = new JButton("Subscribe");
+		btnSubscribe.setEnabled(false);
 		btnSubscribe.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (m_client == null) {
@@ -300,21 +313,25 @@ public class MainWindow {
 		panel_r.setLayout(new BorderLayout(0, 0));
 		panel_r.add(verticalBox, BorderLayout.CENTER);
 		
-		final JList<JCheckBox> list = new JList<JCheckBox>();
-		list.addMouseListener(new MouseAdapter() {
+		final JList<JCheckBox> topicList = new JList<JCheckBox>();
+		// Need this one to be used generally on all methods. The other variable is final to allow
+		// the use in the anonymous action handler
+		topicListReference = topicList;
+		
+		topicList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (!list.isEnabled()) {
+				if (!topicList.isEnabled()) {
 					return;
 				}
 				
-				int index = list.locationToIndex(e.getPoint());
+				int index = topicList.locationToIndex(e.getPoint());
 
 				if (index != -1) {
-					JCheckBox checkbox = list.getModel().getElementAt(index);
+					JCheckBox checkbox = topicList.getModel().getElementAt(index);
 					// Ignore middle and right clicks
 					if (e.getButton() != MouseEvent.BUTTON1) {
-						list.setSelectedIndex(index);
+						topicList.setSelectedIndex(index);
 						return;
 					}
 					s_logger.debug("Changing Selected for element {}", index);
@@ -330,15 +347,17 @@ public class MainWindow {
 							checkbox.setSelected(true);
 						}
 					}
-					list.repaint();
+					topicList.repaint();
 				}
 			}
 		});
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setCellRenderer(new CheckBoxCellRenderer());
-		list.setModel(m_topicAutodiscover.getListModel());
+		topicList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		topicList.setCellRenderer(new CheckBoxCellRenderer());
+		topicList.setModel(m_topicAutodiscover.getListModel());
 		// http://stackoverflow.com/questions/13621261/add-a-jlist-to-a-jscrollpane
-		JScrollPane scrollPane = new JScrollPane(list);
+		JScrollPane scrollPane = new JScrollPane(topicList);
+		scrollPane.setMaximumSize(new Dimension(270, 6500));
+		scrollPane.setPreferredSize(new Dimension(270, 400));
 		
 		//
 		// Popum menu in topic list
@@ -349,18 +368,19 @@ public class MainWindow {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JCheckBox checkbox = list.getSelectedValue();
+				JCheckBox checkbox = topicList.getSelectedValue();
 				if (unsubscribeAndUpdateGui(checkbox.getText())) {
 					m_topicAutodiscover.getListModel().removeElement(checkbox);
 				}
 			}
 		});
 		popupMenu.add(removeMenuItem);
-		addPopup(list, popupMenu);
+		addPopup(topicList, popupMenu);
 		verticalBox.add(scrollPane);
 		panel_r.add(verticalBox_2, BorderLayout.SOUTH);
 		
-		JButton btnTopicAutodiscover = new JButton("Topic Autodiscover");
+		btnTopicAutodiscover = new JButton("Topic Autodiscover");
+		btnTopicAutodiscover.setEnabled(false);
 		btnTopicAutodiscover.setMnemonic('a');
 		btnTopicAutodiscover.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
