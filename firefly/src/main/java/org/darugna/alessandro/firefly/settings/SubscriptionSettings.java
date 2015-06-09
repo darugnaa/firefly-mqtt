@@ -45,9 +45,12 @@ public class SubscriptionSettings {
 	 * @param topic
 	 * @return
 	 */
-	public Boolean isSubscribedTo(String topic) {
+	public boolean isSubscribedTo(String topic) {
 		MqttTopic.validate(topic, true);
-		return m_subscriptions.getOrDefault(topic, Boolean.FALSE);
+		if (m_subscriptions.containsKey(topic)) {
+			return m_subscriptions.get(topic).booleanValue();
+		}
+		return false;
 	}
 	
 	public Set<String> getKnownTopics() {
