@@ -157,17 +157,22 @@ public class MainWindow {
 	private boolean subscribeAndUpdateGui(String topic) {
 		boolean subscribedOk = false;
 		try {
-			m_client.subscribe(topic, 2);
+			MqttTopic.validate(topic, true);
 			
 			SubscriptionSettings subscriptions = SubscriptionSettings.getSettings();
 			if (!subscriptions.isKnownTopic(topic)) {
 				JCheckBox checkbox = new JCheckBox(topic, true);
 				m_topicAutodiscover.getListModel().addElement(checkbox);
 			}
-				
-			subscriptions.setSubscribedStatus(topic, true);
-			subscribedOk = true;
-			s_logger.info("Subscribed <{}>", topic);
+			
+			if (subscriptions.isSubscribedTo(topic)) {
+				s_logger.debug("Already subscribed <{}>", topic);
+			} else {
+				m_client.subscribe(topic, 2);
+				subscriptions.setSubscribedStatus(topic, true);
+				subscribedOk = true;
+				s_logger.info("Subscribed <{}>", topic);
+			}
 		} catch (MqttException e) {
 			s_logger.error("Subscription to <{}> failed", e);
 		} catch (IllegalArgumentException e) {
