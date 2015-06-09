@@ -116,6 +116,8 @@ public class MainWindow {
 		        //m_client.connectWithResult(connOpts);
 		        //m_client.subscribe("owntracks/#");
 		        source.setText("Disconnect");
+		        textFieldAddress.setEnabled(false);
+		        textFieldPort.setEnabled(false);
 		        s_logger.info("Connected");
 			} catch (MqttException e) {
 				s_logger.error("Problem during connection", e);
@@ -132,6 +134,8 @@ public class MainWindow {
 					m_client = null;
 					s_logger.info("Disconnected");
 					source.setText("Connect");
+					textFieldAddress.setEnabled(true);
+			        textFieldPort.setEnabled(true);
 				} catch (MqttException e) {
 					s_logger.error("Disconnect error", e);
 				}
