@@ -12,3 +12,9 @@ Now build with maven
     mvn clean verify
     
 You should find the firefly jar into target/ folder.
+
+## IDE and tools
+
+Firefly MQTT is developed in [Eclipse 4.4 Luna](http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2) with [WindowBuilder](http://www.eclipse.org/windowbuilder/download.php).
+The project is compiled and packed using [Maven 3.0.5](https://maven.apache.org/download.cgi).
+
