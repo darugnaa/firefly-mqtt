@@ -24,6 +24,10 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+
 @SuppressWarnings("serial")
 public class SettingsDialog extends JDialog {
 
@@ -135,6 +139,16 @@ public class SettingsDialog extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
+				okButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						try {
+							MqttSettings.getSettings().saveToDisk();
+							s_logger.info("MqttSettings saved to disk");
+						} catch (IOException e) {
+							s_logger.error("Unable to persist settings on disk", e);
+						}
+					}
+				});
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);

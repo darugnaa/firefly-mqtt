@@ -1,6 +1,13 @@
 package org.darugna.alessandro.firefly.settings;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Holds MQTT options. NOT SYNCHRONIZED.
@@ -9,8 +16,11 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
  */
 public class MqttSettings {
 
+	private static Logger s_logger = LoggerFactory.getLogger(MqttSettings.class);
+			
 	private static final Object s_lock = new Object();
 	private static MqttSettings s_instance;
+	private static final String SETTINGS_FILE_NAME = "settings.json";
 	
 	private String m_brokerAddress;
 	private String m_brokerPort;
@@ -19,6 +29,21 @@ public class MqttSettings {
 	private int m_mqttVersion;
 	
 	private MqttSettings() {
+		try {
+			byte[] content = Files.readAllBytes(Paths.get(SETTINGS_FILE_NAME));
+			JSONObject jsonSettings = new JSONObject(new String(content, "UTF-8"));
+			m_brokerAddress = jsonSettings.getString("brokerAddress");
+		} catch (IOException e) {
+			s_logger.error("Unable to load settings, using default ones", e);
+			loadDefaultSettings();
+		} catch (Throwable t) {
+			// This catch is only for debug purposes
+			s_logger.error("UNEXPECTED ERROR", t);
+			loadDefaultSettings();
+		}
+	}
+	
+	private void loadDefaultSettings() {
 		m_brokerAddress = "iot.eclipse.org";
 		m_brokerPort = "1883";
 		m_userName = "username";
@@ -35,6 +60,17 @@ public class MqttSettings {
 		}
 		
 		return s_instance;
+	}
+	
+	public void saveToDisk() throws IOException {
+		JSONObject jsonSettings = new JSONObject();
+		jsonSettings.put("brokerAddress", m_brokerAddress);
+		jsonSettings.put("brokerPort", m_brokerPort);
+		jsonSettings.put("username", m_userName);
+		jsonSettings.put("password", m_passWord);
+		jsonSettings.put("mqttVersion", Integer.valueOf(m_mqttVersion));
+		
+		Files.write(Paths.get(SETTINGS_FILE_NAME), jsonSettings.toString(1).getBytes("UTF-8"));
 	}
 	
 	public String getBrokerAddress() {
