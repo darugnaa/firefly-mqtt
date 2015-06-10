@@ -22,19 +22,38 @@ public class MqttSettings {
 	private static MqttSettings s_instance;
 	private static final String SETTINGS_FILE_NAME = "settings.json";
 	
+	private static final String SETTINGS_BROKER_ADDRESS     = "brokerAddress";
+	private static final String SETTINGS_BROKER_PORT        = "brokerPort";
+	private static final String SETTINGS_BROKER_USERNAME    = "brokerUsername";
+	private static final String SETTINGS_BROKER_PASSWORD    = "brokerPassword";
+	private static final String SETTINGS_MQTT_VERSION       = "mqttVersion";
+	
 	private String m_brokerAddress;
 	private String m_brokerPort;
-	private String m_userName;
-	private char[] m_passWord;
+	private String m_brokerUsername;
+	private char[] m_brokerPassword;
 	private int m_mqttVersion;
 	
 	private MqttSettings() {
 		try {
 			byte[] content = Files.readAllBytes(Paths.get(SETTINGS_FILE_NAME));
 			JSONObject jsonSettings = new JSONObject(new String(content, "UTF-8"));
-			m_brokerAddress = jsonSettings.getString("brokerAddress");
+			m_brokerAddress = jsonSettings.getString(SETTINGS_BROKER_ADDRESS);
+			m_brokerPort = jsonSettings.getString(SETTINGS_BROKER_PORT);
+			m_brokerUsername = jsonSettings.getString(SETTINGS_BROKER_USERNAME);
+			//m_brokerPassword = jsonSettings.getJSONArray(SETTINGS_BROKER_PASSWORD);
+			Object pass = jsonSettings.getJSONArray(SETTINGS_BROKER_PASSWORD);
+			// Mqtt protocol version is sanitized after reading.
+			m_mqttVersion = jsonSettings.getInt(SETTINGS_MQTT_VERSION);
+			if (m_mqttVersion != MqttConnectOptions.MQTT_VERSION_3_1 &&
+					m_mqttVersion != MqttConnectOptions.MQTT_VERSION_3_1_1 &&
+					m_mqttVersion != MqttConnectOptions.MQTT_VERSION_DEFAULT) {
+				s_logger.warn("Invalid MQTT protocol version in settings <{}>, defaulting to 3.1.1", m_mqttVersion);
+				m_mqttVersion = MqttConnectOptions.MQTT_VERSION_3_1_1;
+			}
+			s_logger.info("Settings loaded from {}", SETTINGS_FILE_NAME);
 		} catch (IOException e) {
-			s_logger.error("Unable to load settings, using default ones", e);
+			s_logger.warn("Unable to load settings file {}, using default ones", e.getMessage());
 			loadDefaultSettings();
 		} catch (Throwable t) {
 			// This catch is only for debug purposes
@@ -46,8 +65,8 @@ public class MqttSettings {
 	private void loadDefaultSettings() {
 		m_brokerAddress = "iot.eclipse.org";
 		m_brokerPort = "1883";
-		m_userName = "username";
-		m_passWord = new char[] {'P', 'a','s','s','w','o','r','d','!','1','2','3'};
+		m_brokerUsername = "username";
+		m_brokerPassword = new char[] {'p', 'a','s','s','w','o','r','d'};
 		m_mqttVersion = MqttConnectOptions.MQTT_VERSION_3_1_1;
 	}
 	
@@ -64,11 +83,11 @@ public class MqttSettings {
 	
 	public void saveToDisk() throws IOException {
 		JSONObject jsonSettings = new JSONObject();
-		jsonSettings.put("brokerAddress", m_brokerAddress);
-		jsonSettings.put("brokerPort", m_brokerPort);
-		jsonSettings.put("username", m_userName);
-		jsonSettings.put("password", m_passWord);
-		jsonSettings.put("mqttVersion", Integer.valueOf(m_mqttVersion));
+		jsonSettings.put(SETTINGS_BROKER_ADDRESS, m_brokerAddress);
+		jsonSettings.put(SETTINGS_BROKER_PORT, m_brokerPort);
+		jsonSettings.put(SETTINGS_BROKER_USERNAME, m_brokerUsername);
+		jsonSettings.put(SETTINGS_BROKER_PASSWORD, m_brokerPassword);
+		jsonSettings.put(SETTINGS_MQTT_VERSION, Integer.valueOf(m_mqttVersion));
 		
 		Files.write(Paths.get(SETTINGS_FILE_NAME), jsonSettings.toString(1).getBytes("UTF-8"));
 	}
@@ -90,20 +109,20 @@ public class MqttSettings {
 	}
 	
 	public String getUserName() {
-		return m_userName;
+		return m_brokerUsername;
 	}
 
 	public char[] getPassWord() {
-		return m_passWord;
+		return m_brokerPassword;
 	}
 
 	public void setPassWord(char[] passWord) {
 		if (passWord == null) {
-			for (int i = 0; i < m_passWord.length; ++i) {
-				m_passWord[i] = 0;
+			for (int i = 0; i < m_brokerPassword.length; ++i) {
+				m_brokerPassword[i] = 0;
 			}
 		}
-		this.m_passWord = passWord;
+		this.m_brokerPassword = passWord;
 	}
 	
 	public int getMqttVersion() {
