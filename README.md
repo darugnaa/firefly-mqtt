@@ -4,9 +4,9 @@ Firefly MQTT is a small "traffic sniffer" for MQTT protocol developed in Java7. 
 <img src="http://i.imgur.com/ueWVwN5.png?1">
 
 MQTT settings like broker, username etc are configurable and saved into a JSON configuration file in the same folder. Please be sure to have write permissions to the working folder where you run Firefly.  
-If you find this tool useful I would like to hear you opinions. If you find a bug or want a feature [open an issue](https://github.com/darugnaa/firefly-mqtt/issues).
+If you find this tool useful I would like to hear your opinions. If you find a bug or want a feature [open an issue](https://github.com/darugnaa/firefly-mqtt/issues).
 
-This release is provided "as is" with _no_ warranties of any kind.
+This software is provided "as is" with _no_ warranties of any kind.
 
 ## Download
 You can download the jar [from here](https://drive.google.com/file/d/0B0tptNwKwCF_WkdXNUl6V01hQVU/view?usp=sharing) and just double-click it to start! If you wish to run it from command line just `java -jar firefly-0.0.1.jar` and you'll see all the nice debug output.
