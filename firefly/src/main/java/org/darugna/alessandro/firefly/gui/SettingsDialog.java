@@ -29,7 +29,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 @SuppressWarnings("serial")
-public class SettingsDialog extends JDialog {
+public class SettingsDialog extends JDialog implements ActionListener {
 
 	private static Logger s_logger = LoggerFactory.getLogger(SettingsDialog.class);
 			
@@ -39,6 +39,7 @@ public class SettingsDialog extends JDialog {
 	private JTextField textFieldUsername;
 	private JTextField textFieldPassword;
 	private JComboBox<String> comboBoxMqttVersion;
+	private JTextField textFieldClientId;
 
 	/**
 	 * Create the dialog.
@@ -56,10 +57,7 @@ public class SettingsDialog extends JDialog {
 	 */
 	private void populateComponents() {
 		MqttSettings settings = MqttSettings.getSettings();
-		textFieldBroker.setText(settings.getBrokerAddress());
-		textFieldPort.setText(settings.getBrokerPort());
-		textFieldUsername.setText(settings.getUserName());
-		
+		textFieldClientId.setText(settings.getClientId());
 		if (settings.getMqttVersion() == MqttConnectOptions.MQTT_VERSION_3_1_1) {
 			comboBoxMqttVersion.setSelectedIndex(0);
 		} else {
@@ -78,6 +76,8 @@ public class SettingsDialog extends JDialog {
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),},
 			new RowSpec[] {
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
@@ -134,31 +134,46 @@ public class SettingsDialog extends JDialog {
 			contentPanel.add(comboBoxMqttVersion, "4, 10, fill, default");
 		}
 		{
+			JLabel lblClientId = new JLabel("Client Id");
+			contentPanel.add(lblClientId, "2, 12, right, default");
+		}
+		{
+			textFieldClientId = new JTextField();
+			contentPanel.add(textFieldClientId, "4, 12, fill, default");
+			textFieldClientId.setColumns(10);
+		}
+		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
-				okButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						try {
-							MqttSettings.getSettings().saveToDisk();
-							s_logger.info("MqttSettings saved to disk");
-						} catch (IOException e) {
-							s_logger.error("Unable to persist settings on disk", e);
-						}
-					}
-				});
+				okButton.addActionListener(this);
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(this);
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		if (arg0.getActionCommand().equals("OK")) {
+			try {
+				MqttSettings.getSettings().saveToDisk();
+				s_logger.info("MqttSettings saved to disk");
+			} catch (IOException e) {
+				s_logger.error("Unable to persist settings on disk", e);
+			}
+		}
+		
+		dispose();
 	}
 
 }

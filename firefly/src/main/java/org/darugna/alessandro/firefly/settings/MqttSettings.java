@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Date;
 
 /**
  * Holds MQTT options. NOT SYNCHRONIZED.
@@ -28,7 +29,7 @@ public class MqttSettings {
 	private static final String SETTINGS_BROKER_USERNAME    = "brokerUsername";
 	private static final String SETTINGS_BROKER_PASSWORD    = "brokerPassword";
 	private static final String SETTINGS_MQTT_VERSION       = "mqttVersion";
-	private static final String SETTINGS_CLIENT_ID           = "clientId";
+	private static final String SETTINGS_CLIENT_ID          = "clientId";
 	
 	private String m_brokerAddress;
 	private String m_brokerPort;
@@ -81,6 +82,11 @@ public class MqttSettings {
 		m_brokerUsername = "username";
 		m_brokerPassword = new char[] {'p', 'a','s','s','w','o','r','d'};
 		m_mqttVersion = MqttConnectOptions.MQTT_VERSION_3_1_1;
+		m_clientId = "Firefly" + String.valueOf((new Date()).getTime());
+		if (m_clientId.length() > 22) {
+			m_clientId = m_clientId.substring(0, 22);
+			s_logger.debug("Shortened Client Id to {}");
+		}
 	}
 	
 	public static MqttSettings getSettings() {

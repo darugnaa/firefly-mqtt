@@ -109,7 +109,7 @@ public class MainWindow {
 		if (m_client == null) {
 			try {
 				String broker = "tcp://" + textFieldAddress.getText().trim() + ":" + textFieldPort.getText().trim();
-				m_client = new MqttClient(broker, "Firefly-6759", new MemoryPersistence());
+				m_client = new MqttClient(broker, MqttSettings.getSettings().getClientId(), new MemoryPersistence());
 				m_client.setCallback(m_callbackHandler);
 		        MqttConnectOptions connOpts = new MqttConnectOptions();
 		        connOpts.setCleanSession(true);
