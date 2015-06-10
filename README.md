@@ -1,5 +1,5 @@
 # Firefly MQTT
-Firefly MQTT is a small "traffic sniffer" for MQTT protocol developed in Java7. It displays received messages in a table, with details lik Retained flag, QoS. Firefly supports decoding [Eclipse Kura](http://www.eclipse.org/kura/) payload format, both regular and gzipped. In this first release all subscriptions have QoS 2.
+Firefly MQTT is a small "traffic sniffer" for MQTT protocol developed in Java7. It displays received messages in a table, with details like Retained flag and QoS. Firefly supports decoding [Eclipse Kura](http://www.eclipse.org/kura/) payload format, both regular and gzipped. In this first release all subscriptions have QoS 2.
 
 <img src="http://i.imgur.com/ueWVwN5.png?1">
 
