@@ -17,11 +17,9 @@ public class SubscriptionSettings {
 	private SubscriptionSettings() {
 		// TODO when realoading settings check all topics
 		m_subscriptions = new TreeMap<String, Boolean>();
-		m_subscriptions.put("owntracks/#", Boolean.FALSE);
-		m_subscriptions.put("VM/#", Boolean.FALSE);
-		m_subscriptions.put("prugna/#", Boolean.FALSE);
 		m_subscriptions.put("$EDC/#", Boolean.FALSE);
 		m_subscriptions.put("$/#", Boolean.FALSE);
+		m_subscriptions.put("#", Boolean.FALSE);
 	}
 	
 	public static SubscriptionSettings getSettings() {
