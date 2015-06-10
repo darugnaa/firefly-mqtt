@@ -1,5 +1,9 @@
 # Firefly MQTT
+Firefly MQTT is a small "traffic sniffer" for MQTT protocol. It displays received messages in a table, with details lik Retained flag, QoS. Firefly supports decoding [Eclipse Kura](http://www.eclipse.org/kura/) payload format, both regular and gzipped.
 
+<img src="http://i.imgur.com/ueWVwN5.png?1">
+
+## Compile!
 Install the required jgoodies forms jar into local maven repository
 
     cd Dependencies
@@ -13,7 +17,7 @@ Now build with maven
     
 You should find the firefly jar into target/ folder.
 
-## IDE and tools
+## Develop!
 
 Firefly MQTT is developed in [Eclipse 4.4 Luna](http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2) with [WindowBuilder](http://www.eclipse.org/windowbuilder/download.php).
 The project is compiled and packed using [Maven 3.0.5](https://maven.apache.org/download.cgi).
