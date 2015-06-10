@@ -72,6 +72,7 @@ public class MainWindow {
 	private JPanel panel_r;
 	private JButton btnTopicAutodiscover;
 	private JButton btnSubscribe;
+	JButton btnOptions;
 	private JTextField textFieldAddress;
 	private JTextField txtSubscribe;
 	private JList topicListReference;
@@ -149,6 +150,7 @@ public class MainWindow {
 	private void setEnabledOnComponentsThatRequireToBeconnected(boolean connected) {
         textFieldAddress.setEnabled(!connected);
         textFieldPort.setEnabled(!connected);
+        btnOptions.setEnabled(!connected);
         btnSubscribe.setEnabled(connected);
         btnTopicAutodiscover.setEnabled(connected);
         topicListReference.setEnabled(connected);
@@ -263,7 +265,7 @@ public class MainWindow {
 		textFieldPort.setColumns(10);
 		panel.add(btnConnect);
 		
-		JButton btnOptions = new JButton("Options");
+		btnOptions = new JButton("Settings");
 		btnOptions.addActionListener(new ActionListener() {
 			
 			// http://stackoverflow.com/questions/1481405/how-to-make-a-jframe-modal-in-swing-java
