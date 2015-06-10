@@ -48,4 +48,4 @@ The project is compiled and packed using [Maven 3.0.5](https://maven.apache.org/
 * Persist settings into user and os specific folders (/home/user/.firefly on linux/osx and %APPDATA% on windows)
 
 ## Libraries
-A complete list of libraries used in this project can be found [in the pom.xml](https://github.com/darugnaa/firefly-mqtt/blob/master/firefly/pom.xml#L31). I have copied classes from [Eclipse Kura source code](https://github.com/eclipse/kura) required to decode Kura payloads.
+A complete list of libraries used in this project can be found [in the pom.xml](https://github.com/darugnaa/firefly-mqtt/blob/master/firefly/pom.xml#L31). I included in my sources the classes from [Eclipse Kura source code](https://github.com/eclipse/kura) required to decode Kura payloads.
