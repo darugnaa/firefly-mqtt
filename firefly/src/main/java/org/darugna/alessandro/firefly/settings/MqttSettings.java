@@ -28,12 +28,14 @@ public class MqttSettings {
 	private static final String SETTINGS_BROKER_USERNAME    = "brokerUsername";
 	private static final String SETTINGS_BROKER_PASSWORD    = "brokerPassword";
 	private static final String SETTINGS_MQTT_VERSION       = "mqttVersion";
+	private static final String SETTINGS_CLIENT_ID           = "clientId";
 	
 	private String m_brokerAddress;
 	private String m_brokerPort;
 	private String m_brokerUsername;
 	private char[] m_brokerPassword;
 	private int m_mqttVersion;
+	private String m_clientId;
 	
 	private MqttSettings() {
 		try {
@@ -61,6 +63,7 @@ public class MqttSettings {
 				s_logger.warn("Invalid MQTT protocol version in settings <{}>, defaulting to 3.1.1", m_mqttVersion);
 				m_mqttVersion = MqttConnectOptions.MQTT_VERSION_3_1_1;
 			}
+			m_clientId = jsonSettings.getString(SETTINGS_CLIENT_ID);
 			s_logger.info("Settings loaded from {}", SETTINGS_FILE_NAME);
 		} catch (IOException e) {
 			s_logger.warn("Unable to load settings file {}, using default ones", e.getMessage());
@@ -98,6 +101,7 @@ public class MqttSettings {
 		jsonSettings.put(SETTINGS_BROKER_USERNAME, m_brokerUsername);
 		jsonSettings.put(SETTINGS_BROKER_PASSWORD, m_brokerPassword);
 		jsonSettings.put(SETTINGS_MQTT_VERSION, Integer.valueOf(m_mqttVersion));
+		jsonSettings.put(SETTINGS_CLIENT_ID, m_clientId);
 		
 		Files.write(Paths.get(SETTINGS_FILE_NAME), jsonSettings.toString(1).getBytes("UTF-8"));
 	}
@@ -141,5 +145,13 @@ public class MqttSettings {
 	
 	public void setMqttVersion(int mqttVersion) {
 		m_mqttVersion = mqttVersion;
+	}
+	
+	public String getClientId() {
+		return m_clientId;
+	}
+	
+	public void setClientId(String clientId) {
+		m_clientId = clientId;
 	}
 }
