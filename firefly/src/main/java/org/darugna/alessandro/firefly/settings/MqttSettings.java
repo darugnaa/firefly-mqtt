@@ -82,7 +82,7 @@ public class MqttSettings {
 		m_brokerUsername = "username";
 		m_brokerPassword = new char[] {'p', 'a','s','s','w','o','r','d'};
 		m_mqttVersion = MqttConnectOptions.MQTT_VERSION_3_1_1;
-		m_clientId = "Firefly" + String.valueOf((new Date()).getTime());
+		m_clientId = "Firefly-" + String.valueOf((new Date()).getTime());
 		if (m_clientId.length() > 22) {
 			m_clientId = m_clientId.substring(0, 22);
 			s_logger.debug("Shortened Client Id to {}");
