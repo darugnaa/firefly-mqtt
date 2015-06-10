@@ -17,11 +17,9 @@ public class SubscriptionSettings {
 	private SubscriptionSettings() {
 		// TODO when realoading settings check all topics
 		m_subscriptions = new TreeMap<String, Boolean>();
-		m_subscriptions.put("owntracks/#", Boolean.FALSE);
-		m_subscriptions.put("VM/#", Boolean.FALSE);
-		m_subscriptions.put("prugna/#", Boolean.FALSE);
 		m_subscriptions.put("$EDC/#", Boolean.FALSE);
 		m_subscriptions.put("$/#", Boolean.FALSE);
+		m_subscriptions.put("#", Boolean.FALSE);
 	}
 	
 	public static SubscriptionSettings getSettings() {
@@ -45,9 +43,12 @@ public class SubscriptionSettings {
 	 * @param topic
 	 * @return
 	 */
-	public Boolean isSubscribedTo(String topic) {
+	public boolean isSubscribedTo(String topic) {
 		MqttTopic.validate(topic, true);
-		return m_subscriptions.getOrDefault(topic, Boolean.FALSE);
+		if (m_subscriptions.containsKey(topic)) {
+			return m_subscriptions.get(topic).booleanValue();
+		}
+		return false;
 	}
 	
 	public Set<String> getKnownTopics() {

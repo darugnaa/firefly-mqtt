@@ -6,13 +6,13 @@
 
 	<groupId>org.darugna.alessandro</groupId>
 	<artifactId>firefly</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	
 	<packaging>jar</packaging>
 	
 	
 	<name>Firefly MQTT - Shed some light on what's going on!</name>
-	<url></url>
+	<url>https://github.com/darugnaa/firefly-mqtt/</url>
 
 	<properties>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
@@ -58,6 +58,11 @@
 			<groupId>com.jgoodies</groupId>
 			<artifactId>forms</artifactId>
 			<version>1.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
 		</dependency>
 	</dependencies>
 
@@ -112,4 +117,5 @@
 		</plugins>
 	</build>
 
+	<description>A small &quot;traffic sniffer&quot; for MQTT protocol.</description>
 </project>

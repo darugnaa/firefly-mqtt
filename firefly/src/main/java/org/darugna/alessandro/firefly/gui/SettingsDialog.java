@@ -24,8 +24,12 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+
 @SuppressWarnings("serial")
-public class SettingsDialog extends JDialog {
+public class SettingsDialog extends JDialog implements ActionListener {
 
 	private static Logger s_logger = LoggerFactory.getLogger(SettingsDialog.class);
 			
@@ -35,6 +39,7 @@ public class SettingsDialog extends JDialog {
 	private JTextField textFieldUsername;
 	private JTextField textFieldPassword;
 	private JComboBox<String> comboBoxMqttVersion;
+	private JTextField textFieldClientId;
 
 	/**
 	 * Create the dialog.
@@ -54,13 +59,15 @@ public class SettingsDialog extends JDialog {
 		MqttSettings settings = MqttSettings.getSettings();
 		textFieldBroker.setText(settings.getBrokerAddress());
 		textFieldPort.setText(settings.getBrokerPort());
-		textFieldUsername.setText(settings.getUserName());
-		
+		textFieldUsername.setText(settings.getUsername());
+		textFieldPassword.setText(new String(settings.getPassWord()));
+		// Assume that the index 0 (first element) is MQTT version 3.1.1
 		if (settings.getMqttVersion() == MqttConnectOptions.MQTT_VERSION_3_1_1) {
 			comboBoxMqttVersion.setSelectedIndex(0);
 		} else {
 			comboBoxMqttVersion.setSelectedIndex(1);
 		}
+		textFieldClientId.setText(settings.getClientId());
 	}
 	
 	private void initialize() {
@@ -74,6 +81,8 @@ public class SettingsDialog extends JDialog {
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),},
 			new RowSpec[] {
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
@@ -130,21 +139,54 @@ public class SettingsDialog extends JDialog {
 			contentPanel.add(comboBoxMqttVersion, "4, 10, fill, default");
 		}
 		{
+			JLabel lblClientId = new JLabel("Client Id");
+			contentPanel.add(lblClientId, "2, 12, right, default");
+		}
+		{
+			textFieldClientId = new JTextField();
+			contentPanel.add(textFieldClientId, "4, 12, fill, default");
+			textFieldClientId.setColumns(10);
+		}
+		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
+				okButton.addActionListener(this);
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(this);
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		if (arg0.getActionCommand().equals("OK")) {
+			try {
+				// Update my settings object and save to disk
+				MqttSettings settings = MqttSettings.getSettings();
+				settings.setBrokerAddress(textFieldBroker.getText());
+				settings.setBrokerPort(textFieldPort.getText());
+				settings.setUsername(textFieldUsername.getText());
+				settings.setPassWord(textFieldPassword.getText().toCharArray());
+				settings.setMqttVersion(comboBoxMqttVersion.getSelectedIndex() == 0 ? MqttConnectOptions.MQTT_VERSION_3_1_1 : MqttConnectOptions.MQTT_VERSION_3_1);
+				settings.setClientId(textFieldClientId.getText());
+				settings.saveToDisk();
+				s_logger.info("MqttSettings saved to disk");
+			} catch (IOException e) {
+				s_logger.error("Unable to persist settings on disk", e);
+			}
+		}
+		
+		dispose();
 	}
 
 }

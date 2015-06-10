@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.Box;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Component;
 import java.io.IOException;
@@ -46,6 +47,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.awt.Dialog.ModalExclusionType;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.ListSelectionModel;
 
@@ -56,11 +59,10 @@ import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.Toolkit;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.JPopupMenu;
 
-public class MainWindow {
+public class MainWindow implements WindowListener {
 
 	private static Logger s_logger = LoggerFactory.getLogger(MainWindow.class);
 	private MqttClient m_client;
@@ -68,8 +70,13 @@ public class MainWindow {
 	private TopicAutodiscover m_topicAutodiscover;
 	
 	private JFrame frmFireflyMqtt;
+	private JPanel panel_r;
+	private JButton btnTopicAutodiscover;
+	private JButton btnSubscribe;
+	JButton btnOptions;
 	private JTextField textFieldAddress;
 	private JTextField txtSubscribe;
+	private JList topicListReference;
 	private JTable table;
 	private JTextField textFieldPort;
 
@@ -104,11 +111,11 @@ public class MainWindow {
 		if (m_client == null) {
 			try {
 				String broker = "tcp://" + textFieldAddress.getText().trim() + ":" + textFieldPort.getText().trim();
-				m_client = new MqttClient(broker, "Firefly-6759", new MemoryPersistence());
+				m_client = new MqttClient(broker, MqttSettings.getSettings().getClientId(), new MemoryPersistence());
 				m_client.setCallback(m_callbackHandler);
 		        MqttConnectOptions connOpts = new MqttConnectOptions();
 		        connOpts.setCleanSession(true);
-		        connOpts.setUserName(MqttSettings.getSettings().getUserName());
+		        connOpts.setUserName(MqttSettings.getSettings().getUsername());
 		        connOpts.setPassword(MqttSettings.getSettings().getPassWord());
 		        connOpts.setMqttVersion(MqttSettings.getSettings().getMqttVersion());
 		        s_logger.info("Connecting to broker {} ", broker);
@@ -116,6 +123,7 @@ public class MainWindow {
 		        //m_client.connectWithResult(connOpts);
 		        //m_client.subscribe("owntracks/#");
 		        source.setText("Disconnect");
+		        setEnabledOnComponentsThatRequireToBeconnected(true);
 		        s_logger.info("Connected");
 			} catch (MqttException e) {
 				s_logger.error("Problem during connection", e);
@@ -132,6 +140,7 @@ public class MainWindow {
 					m_client = null;
 					s_logger.info("Disconnected");
 					source.setText("Connect");
+					setEnabledOnComponentsThatRequireToBeconnected(false);
 				} catch (MqttException e) {
 					s_logger.error("Disconnect error", e);
 				}
@@ -139,21 +148,34 @@ public class MainWindow {
 		}
 	}
 	
+	private void setEnabledOnComponentsThatRequireToBeconnected(boolean connected) {
+        textFieldAddress.setEnabled(!connected);
+        textFieldPort.setEnabled(!connected);
+        btnOptions.setEnabled(!connected);
+        btnSubscribe.setEnabled(connected);
+        btnTopicAutodiscover.setEnabled(connected);
+        topicListReference.setEnabled(connected);
+	}
 	
 	private boolean subscribeAndUpdateGui(String topic) {
 		boolean subscribedOk = false;
 		try {
-			m_client.subscribe(topic, 2);
+			MqttTopic.validate(topic, true);
 			
 			SubscriptionSettings subscriptions = SubscriptionSettings.getSettings();
 			if (!subscriptions.isKnownTopic(topic)) {
 				JCheckBox checkbox = new JCheckBox(topic, true);
 				m_topicAutodiscover.getListModel().addElement(checkbox);
 			}
-				
-			subscriptions.setSubscribedStatus(topic, true);
-			subscribedOk = true;
-			s_logger.info("Subscribed <{}>", topic);
+			
+			if (subscriptions.isSubscribedTo(topic)) {
+				s_logger.debug("Already subscribed <{}>", topic);
+			} else {
+				m_client.subscribe(topic, 2);
+				subscriptions.setSubscribedStatus(topic, true);
+				subscribedOk = true;
+				s_logger.info("Subscribed <{}>", topic);
+			}
 		} catch (MqttException e) {
 			s_logger.error("Subscription to <{}> failed", e);
 		} catch (IllegalArgumentException e) {
@@ -182,6 +204,11 @@ public class MainWindow {
 	}
 	
 	
+	private void populateComponentsFromSettings() {
+		textFieldAddress.setText(MqttSettings.getSettings().getBrokerAddress());
+		textFieldPort.setText(MqttSettings.getSettings().getBrokerPort());
+	}
+	
 	//
 	// Methods created by WindowBuilder and customized a little
 	//
@@ -203,13 +230,14 @@ public class MainWindow {
 		TableFiller tf = new TableFiller((DefaultTableModel)table.getModel());
 		m_callbackHandler.addMessageHandler(tf);
 		// Populate MainWindow components values
-		textFieldAddress.setText(MqttSettings.getSettings().getBrokerAddress());
-		textFieldPort.setText(MqttSettings.getSettings().getBrokerPort());
+		populateComponentsFromSettings();
 		Set<String> subs = SubscriptionSettings.getSettings().getKnownTopics();
 		for (String topic : subs) {
 			JCheckBox checkbox = new JCheckBox(topic, SubscriptionSettings.getSettings().isSubscribedTo(topic));
 			m_topicAutodiscover.getListModel().addElement(checkbox);
 		}
+		// Not connected when starting up
+		setEnabledOnComponentsThatRequireToBeconnected(false);
 	}
 
 	/**
@@ -242,12 +270,14 @@ public class MainWindow {
 		textFieldPort.setColumns(10);
 		panel.add(btnConnect);
 		
-		JButton btnOptions = new JButton("Options");
+		btnOptions = new JButton("Settings");
+		final MainWindow reference = this;
 		btnOptions.addActionListener(new ActionListener() {
 			
 			// http://stackoverflow.com/questions/1481405/how-to-make-a-jframe-modal-in-swing-java
 			public void actionPerformed(ActionEvent arg0) {
 				final JDialog settingsFrame = new SettingsDialog(frmFireflyMqtt);
+				settingsFrame.addWindowListener(reference);
 				settingsFrame.setVisible(true);
 			}
 		});
@@ -266,7 +296,7 @@ public class MainWindow {
 		});
 		panel.add(btnClearTable);
 		
-		JPanel panel_r = new JPanel();
+		panel_r = new JPanel();
 		frmFireflyMqtt.getContentPane().add(panel_r, BorderLayout.EAST);
 		
 		Box verticalBox = Box.createVerticalBox();
@@ -278,7 +308,8 @@ public class MainWindow {
 		txtSubscribe.setText("Subscribe");
 		txtSubscribe.setColumns(10);
 		
-		JButton btnSubscribe = new JButton("Subscribe");
+		btnSubscribe = new JButton("Subscribe");
+		btnSubscribe.setEnabled(false);
 		btnSubscribe.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (m_client == null) {
@@ -296,21 +327,25 @@ public class MainWindow {
 		panel_r.setLayout(new BorderLayout(0, 0));
 		panel_r.add(verticalBox, BorderLayout.CENTER);
 		
-		final JList<JCheckBox> list = new JList<JCheckBox>();
-		list.addMouseListener(new MouseAdapter() {
+		final JList<JCheckBox> topicList = new JList<JCheckBox>();
+		// Need this one to be used generally on all methods. The other variable is final to allow
+		// the use in the anonymous action handler
+		topicListReference = topicList;
+		
+		topicList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (!list.isEnabled()) {
+				if (!topicList.isEnabled()) {
 					return;
 				}
 				
-				int index = list.locationToIndex(e.getPoint());
+				int index = topicList.locationToIndex(e.getPoint());
 
 				if (index != -1) {
-					JCheckBox checkbox = list.getModel().getElementAt(index);
+					JCheckBox checkbox = topicList.getModel().getElementAt(index);
 					// Ignore middle and right clicks
 					if (e.getButton() != MouseEvent.BUTTON1) {
-						list.setSelectedIndex(index);
+						topicList.setSelectedIndex(index);
 						return;
 					}
 					s_logger.debug("Changing Selected for element {}", index);
@@ -326,15 +361,17 @@ public class MainWindow {
 							checkbox.setSelected(true);
 						}
 					}
-					list.repaint();
+					topicList.repaint();
 				}
 			}
 		});
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setCellRenderer(new CheckBoxCellRenderer());
-		list.setModel(m_topicAutodiscover.getListModel());
+		topicList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		topicList.setCellRenderer(new CheckBoxCellRenderer());
+		topicList.setModel(m_topicAutodiscover.getListModel());
 		// http://stackoverflow.com/questions/13621261/add-a-jlist-to-a-jscrollpane
-		JScrollPane scrollPane = new JScrollPane(list);
+		JScrollPane scrollPane = new JScrollPane(topicList);
+		scrollPane.setMaximumSize(new Dimension(270, 6500));
+		scrollPane.setPreferredSize(new Dimension(270, 400));
 		
 		//
 		// Popum menu in topic list
@@ -345,18 +382,19 @@ public class MainWindow {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JCheckBox checkbox = list.getSelectedValue();
+				JCheckBox checkbox = topicList.getSelectedValue();
 				if (unsubscribeAndUpdateGui(checkbox.getText())) {
 					m_topicAutodiscover.getListModel().removeElement(checkbox);
 				}
 			}
 		});
 		popupMenu.add(removeMenuItem);
-		addPopup(list, popupMenu);
+		addPopup(topicList, popupMenu);
 		verticalBox.add(scrollPane);
 		panel_r.add(verticalBox_2, BorderLayout.SOUTH);
 		
-		JButton btnTopicAutodiscover = new JButton("Topic Autodiscover");
+		btnTopicAutodiscover = new JButton("Topic Autodiscover");
+		btnTopicAutodiscover.setEnabled(false);
 		btnTopicAutodiscover.setMnemonic('a');
 		btnTopicAutodiscover.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -439,5 +477,45 @@ public class MainWindow {
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		populateComponentsFromSettings();
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
 	}
 }

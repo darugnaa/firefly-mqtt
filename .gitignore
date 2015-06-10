@@ -11,5 +11,7 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+# Target directories and temporary files
 target/
 target-eclipse/
+dependency-reduced-pom.xml
