@@ -8,7 +8,7 @@ MQTT settings like broker, username etc are configurable and saved into a JSON c
 ## Download
 You can download the jar [from here](https://drive.google.com/file/d/0B0tptNwKwCF_WkdXNUl6V01hQVU/view?usp=sharing) and just double-click it to start! If you wish to run it from command line just `java -jar firefly-0.0.1.jar` and you'll see all the nice debug output.
 
-**Important**: I released a shaded jar (aka uber jar) with all dependencies inside just for convenience.
+**Important**: I released a shaded jar (aka uber jar) with all dependencies inside just for convenience. See [Open Source section](#opensource) for a list of libraries used.
 
 ## Compile!
 Clone the repository to your local machine
@@ -45,3 +45,5 @@ The project is compiled and packed using [Maven 3.0.5](https://maven.apache.org/
 * Limit the maximum of messages that the table can hold
 * Persist subscriptions settings
 * Persist settings into user and os specific folders (/home/user/.firefly on linux/osx and %APPDATA% on windows)
+
+## Open Source
