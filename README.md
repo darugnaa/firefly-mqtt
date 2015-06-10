@@ -3,9 +3,12 @@ Firefly MQTT is a small "traffic sniffer" for MQTT protocol developed in Java7. 
 
 <img src="http://i.imgur.com/ueWVwN5.png?1">
 
-You can download the jar from here and just double-click it to start! If you wish to run it from command line just `java -jar firefly-0.0.1.jar` and you'll see all the nice debug output.
+MQTT settings like broker, username etc are configurable and saved into a JSON configuration file in the same folder. Please be sure to have write permissions to the working folder where you run Firefly.
 
-**Important**: I released a shaded jar (aka uber jar)
+## Download
+You can download the jar [from here](https://drive.google.com/file/d/0B0tptNwKwCF_WkdXNUl6V01hQVU/view?usp=sharing) and just double-click it to start! If you wish to run it from command line just `java -jar firefly-0.0.1.jar` and you'll see all the nice debug output.
+
+**Important**: I released a shaded jar (aka uber jar) with all dependencies inside just for convenience.
 
 ## Compile!
 Clone the repository to your local machine
@@ -27,7 +30,7 @@ Now build with Maven
 You should find the firefly jar into `target/` folder.
 
 ## Develop!
-Firefly MQTT is developed in [Eclipse 4.4 Luna](http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2) with [WindowBuilder](http://www.eclipse.org/windowbuilder/download.php).
+Firefly MQTT is developed in [Eclipse 4.4 Luna](http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/lunasr2) with [WindowBuilder](http://www.eclipse.org/windowbuilder/download.php). Import the project in Eclipse with "File -> Import", select "General -> Existing projects into Workspace" and open the inner `firefly` folder.  
 The project is compiled and packed using [Maven 3.0.5](https://maven.apache.org/download.cgi).
 
 ## TO DOs
@@ -41,3 +44,4 @@ The project is compiled and packed using [Maven 3.0.5](https://maven.apache.org/
 * Warn the user on connection issues
 * Limit the maximum of messages that the table can hold
 * Persist subscriptions settings
+* Persist settings into user and os specific folders (/home/user/.firefly on linux/osx and %APPDATA% on windows)
