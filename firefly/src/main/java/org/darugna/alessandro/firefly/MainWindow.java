@@ -47,6 +47,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.awt.Dialog.ModalExclusionType;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.ListSelectionModel;
 
@@ -57,11 +59,10 @@ import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.Toolkit;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.JPopupMenu;
 
-public class MainWindow {
+public class MainWindow implements WindowListener {
 
 	private static Logger s_logger = LoggerFactory.getLogger(MainWindow.class);
 	private MqttClient m_client;
@@ -203,6 +204,11 @@ public class MainWindow {
 	}
 	
 	
+	private void populateComponentsFromSettings() {
+		textFieldAddress.setText(MqttSettings.getSettings().getBrokerAddress());
+		textFieldPort.setText(MqttSettings.getSettings().getBrokerPort());
+	}
+	
 	//
 	// Methods created by WindowBuilder and customized a little
 	//
@@ -224,8 +230,7 @@ public class MainWindow {
 		TableFiller tf = new TableFiller((DefaultTableModel)table.getModel());
 		m_callbackHandler.addMessageHandler(tf);
 		// Populate MainWindow components values
-		textFieldAddress.setText(MqttSettings.getSettings().getBrokerAddress());
-		textFieldPort.setText(MqttSettings.getSettings().getBrokerPort());
+		populateComponentsFromSettings();
 		Set<String> subs = SubscriptionSettings.getSettings().getKnownTopics();
 		for (String topic : subs) {
 			JCheckBox checkbox = new JCheckBox(topic, SubscriptionSettings.getSettings().isSubscribedTo(topic));
@@ -266,11 +271,13 @@ public class MainWindow {
 		panel.add(btnConnect);
 		
 		btnOptions = new JButton("Settings");
+		final MainWindow reference = this;
 		btnOptions.addActionListener(new ActionListener() {
 			
 			// http://stackoverflow.com/questions/1481405/how-to-make-a-jframe-modal-in-swing-java
 			public void actionPerformed(ActionEvent arg0) {
 				final JDialog settingsFrame = new SettingsDialog(frmFireflyMqtt);
+				settingsFrame.addWindowListener(reference);
 				settingsFrame.setVisible(true);
 			}
 		});
@@ -470,5 +477,45 @@ public class MainWindow {
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		populateComponentsFromSettings();
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		s_logger.debug("EVENT {}", e);
 	}
 }
