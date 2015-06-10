@@ -1,6 +1,7 @@
 package org.darugna.alessandro.firefly.settings;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,16 @@ public class MqttSettings {
 			m_brokerPort = jsonSettings.getString(SETTINGS_BROKER_PORT);
 			m_brokerUsername = jsonSettings.getString(SETTINGS_BROKER_USERNAME);
 			//m_brokerPassword = jsonSettings.getJSONArray(SETTINGS_BROKER_PASSWORD);
-			Object pass = jsonSettings.getJSONArray(SETTINGS_BROKER_PASSWORD);
+			JSONArray pass = jsonSettings.getJSONArray(SETTINGS_BROKER_PASSWORD);
+			m_brokerPassword = new char[pass.length()];
+			for (int i = 0; i < pass.length(); ++i) {
+				String character = pass.getString(i);
+				if (character.length() != 1) {
+					throw new RuntimeException("Cannot decode password");
+				}
+				m_brokerPassword[i] = character.charAt(0);
+			}
+			pass = null;
 			// Mqtt protocol version is sanitized after reading.
 			m_mqttVersion = jsonSettings.getInt(SETTINGS_MQTT_VERSION);
 			if (m_mqttVersion != MqttConnectOptions.MQTT_VERSION_3_1 &&
