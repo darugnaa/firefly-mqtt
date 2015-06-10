@@ -6,7 +6,7 @@
 
 	<groupId>org.darugna.alessandro</groupId>
 	<artifactId>firefly</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	
 	<packaging>jar</packaging>
 	
@@ -117,4 +117,5 @@
 		</plugins>
 	</build>
 
+	<description>A small &quot;traffic sniffer&quot; for MQTT protocol.</description>
 </project>
