@@ -128,8 +128,12 @@ public class MqttSettings {
 		m_brokerPort = brokerPort.trim();
 	}
 	
-	public String getUserName() {
+	public String getUsername() {
 		return m_brokerUsername;
+	}
+	
+	public void setUsername(String username) {
+		m_brokerUsername = username;
 	}
 
 	public char[] getPassWord() {

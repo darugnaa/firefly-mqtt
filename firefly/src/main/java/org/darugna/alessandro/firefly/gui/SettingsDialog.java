@@ -57,12 +57,17 @@ public class SettingsDialog extends JDialog implements ActionListener {
 	 */
 	private void populateComponents() {
 		MqttSettings settings = MqttSettings.getSettings();
-		textFieldClientId.setText(settings.getClientId());
+		textFieldBroker.setText(settings.getBrokerAddress());
+		textFieldPort.setText(settings.getBrokerPort());
+		textFieldUsername.setText(settings.getUsername());
+		textFieldPassword.setText(new String(settings.getPassWord()));
+		// Assume that the index 0 (first element) is MQTT version 3.1.1
 		if (settings.getMqttVersion() == MqttConnectOptions.MQTT_VERSION_3_1_1) {
 			comboBoxMqttVersion.setSelectedIndex(0);
 		} else {
 			comboBoxMqttVersion.setSelectedIndex(1);
 		}
+		textFieldClientId.setText(settings.getClientId());
 	}
 	
 	private void initialize() {
@@ -166,7 +171,15 @@ public class SettingsDialog extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getActionCommand().equals("OK")) {
 			try {
-				MqttSettings.getSettings().saveToDisk();
+				// Update my settings object and save to disk
+				MqttSettings settings = MqttSettings.getSettings();
+				settings.setBrokerAddress(textFieldBroker.getText());
+				settings.setBrokerPort(textFieldPort.getText());
+				settings.setUsername(textFieldUsername.getText());
+				settings.setPassWord(textFieldPassword.getText().toCharArray());
+				settings.setMqttVersion(comboBoxMqttVersion.getSelectedIndex() == 0 ? MqttConnectOptions.MQTT_VERSION_3_1_1 : MqttConnectOptions.MQTT_VERSION_3_1);
+				settings.setClientId(textFieldClientId.getText());
+				settings.saveToDisk();
 				s_logger.info("MqttSettings saved to disk");
 			} catch (IOException e) {
 				s_logger.error("Unable to persist settings on disk", e);

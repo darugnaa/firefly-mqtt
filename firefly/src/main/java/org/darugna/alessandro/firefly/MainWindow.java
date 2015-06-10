@@ -113,7 +113,7 @@ public class MainWindow {
 				m_client.setCallback(m_callbackHandler);
 		        MqttConnectOptions connOpts = new MqttConnectOptions();
 		        connOpts.setCleanSession(true);
-		        connOpts.setUserName(MqttSettings.getSettings().getUserName());
+		        connOpts.setUserName(MqttSettings.getSettings().getUsername());
 		        connOpts.setPassword(MqttSettings.getSettings().getPassWord());
 		        connOpts.setMqttVersion(MqttSettings.getSettings().getMqttVersion());
 		        s_logger.info("Connecting to broker {} ", broker);
