@@ -457,6 +457,21 @@ public class MainWindow implements WindowListener {
 		table.getColumnModel().getColumn(6).setMinWidth(60);
 		table.getColumnModel().getColumn(6).setMaxWidth(60);
 		
+		JPopupMenu tablePopupMenu = new JPopupMenu();
+		JMenuItem copyTopicMenuItem = new JMenuItem("Copy topic");
+		copyTopicMenuItem.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int selectedRow = table.getSelectedRow();
+				s_logger.debug("Copying topic in row {}", selectedRow);
+			}
+		});
+		
+		
+		tablePopupMenu.add(copyTopicMenuItem);
+		addPopup(table, tablePopupMenu);
 		JScrollPane scrollPaneTable = new JScrollPane(table);
 		frmFireflyMqtt.getContentPane().add(scrollPaneTable, BorderLayout.CENTER);
 	}
