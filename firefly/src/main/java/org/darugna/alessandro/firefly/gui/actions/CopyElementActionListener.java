@@ -18,6 +18,8 @@ public final class CopyElementActionListener implements ActionListener {
 	public static final int COPY_TOPIC = 1;
 	public static final int COPY_PAYLOAD = 2;
 	public static final int COPY_TOPIC_AND_PAYLOAD = 3;
+	public static final int COPY_BODY = 4;
+	
 	
 	private final JTable m_table;
 	private int m_copyTarget;
@@ -51,8 +53,12 @@ public final class CopyElementActionListener implements ActionListener {
 							" " +
 							(String) m_table.getModel().getValueAt(selectedRowIndex, 3);
 			break;
+		case COPY_BODY:
+			valueToCopy = (String) m_table.getModel().getValueAt(selectedRowIndex, 4);
+			break;
 		}
 		
+		// http://stackoverflow.com/questions/6710350/copying-text-to-the-clipboard-using-java
 		if (valueToCopy != null) {
 			StringSelection stringSelection = new StringSelection(valueToCopy);
 			Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
