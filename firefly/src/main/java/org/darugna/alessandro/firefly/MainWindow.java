@@ -36,6 +36,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.darugna.alessandro.firefly.gui.CheckBoxCellRenderer;
 import org.darugna.alessandro.firefly.gui.SettingsDialog;
 import org.darugna.alessandro.firefly.gui.TableFiller;
+import org.darugna.alessandro.firefly.gui.actions.CopyElementActionListener;
 import org.darugna.alessandro.firefly.settings.MqttSettings;
 import org.darugna.alessandro.firefly.settings.SubscriptionSettings;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -392,7 +393,7 @@ public class MainWindow implements WindowListener {
 		addPopup(topicList, popupMenu);
 		verticalBox.add(scrollPane);
 		panel_r.add(verticalBox_2, BorderLayout.SOUTH);
-		
+
 		btnTopicAutodiscover = new JButton("Topic Autodiscover");
 		btnTopicAutodiscover.setEnabled(false);
 		btnTopicAutodiscover.setMnemonic('a');
@@ -456,6 +457,25 @@ public class MainWindow implements WindowListener {
 		table.getColumnModel().getColumn(6).setPreferredWidth(60);
 		table.getColumnModel().getColumn(6).setMinWidth(60);
 		table.getColumnModel().getColumn(6).setMaxWidth(60);
+		
+		JPopupMenu tablePopupMenu = new JPopupMenu();
+		JMenuItem copyTopicMenuItem = new JMenuItem("Copy topic");
+		copyTopicMenuItem.addActionListener(new CopyElementActionListener(table,
+												CopyElementActionListener.COPY_TOPIC));
+		JMenuItem copyPayloadMenuItem = new JMenuItem("Copy payload");
+		copyPayloadMenuItem.addActionListener(new CopyElementActionListener(table,
+												  CopyElementActionListener.COPY_PAYLOAD));
+		JMenuItem copyBodyMenuItem = new JMenuItem("Copy body");
+		copyBodyMenuItem.addActionListener(new CopyElementActionListener(table,
+												  CopyElementActionListener.COPY_BODY));
+		JMenuItem copyBothMenuItem = new JMenuItem("Copy topic + payload");
+		copyBothMenuItem.addActionListener(new CopyElementActionListener(table,
+											   CopyElementActionListener.COPY_TOPIC_AND_PAYLOAD));
+		tablePopupMenu.add(copyTopicMenuItem);
+		tablePopupMenu.add(copyPayloadMenuItem);
+		tablePopupMenu.add(copyBodyMenuItem);
+		tablePopupMenu.add(copyBothMenuItem);
+		addPopup(table, tablePopupMenu);
 		
 		JScrollPane scrollPaneTable = new JScrollPane(table);
 		frmFireflyMqtt.getContentPane().add(scrollPaneTable, BorderLayout.CENTER);
