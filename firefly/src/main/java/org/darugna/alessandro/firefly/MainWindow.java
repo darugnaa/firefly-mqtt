@@ -466,7 +466,7 @@ public class MainWindow implements WindowListener {
 		copyPayloadMenuItem.addActionListener(new CopyElementActionListener(table,
 												  CopyElementActionListener.COPY_PAYLOAD));
 		JMenuItem copyBodyMenuItem = new JMenuItem("Copy body");
-		copyPayloadMenuItem.addActionListener(new CopyElementActionListener(table,
+		copyBodyMenuItem.addActionListener(new CopyElementActionListener(table,
 												  CopyElementActionListener.COPY_BODY));
 		JMenuItem copyBothMenuItem = new JMenuItem("Copy topic + payload");
 		copyBothMenuItem.addActionListener(new CopyElementActionListener(table,
