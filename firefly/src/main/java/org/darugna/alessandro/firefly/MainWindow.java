@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.log4j.PropertyConfigurator;
 import org.darugna.alessandro.firefly.gui.CheckBoxCellRenderer;
+import org.darugna.alessandro.firefly.gui.PublishWindow;
 import org.darugna.alessandro.firefly.gui.SettingsDialog;
 import org.darugna.alessandro.firefly.gui.TableFiller;
 import org.darugna.alessandro.firefly.gui.actions.CopyElementActionListener;
@@ -297,6 +298,20 @@ public class MainWindow implements WindowListener {
 		});
 		panel.add(btnClearTable);
 		
+		JButton btnPublish = new JButton("Publish");
+		btnPublish.addActionListener(new ActionListener() {
+			private PublishWindow pb = null;
+			public void actionPerformed(ActionEvent arg0) {
+				if (pb == null) {
+					s_logger.debug("Opening Publish window");
+					pb = new PublishWindow();
+					pb.addWindowListener(reference);
+					pb.setVisible(true);
+				}
+			}
+		});
+		panel.add(btnPublish);
+		
 		panel_r = new JPanel();
 		frmFireflyMqtt.getContentPane().add(panel_r, BorderLayout.EAST);
 		
@@ -506,6 +521,7 @@ public class MainWindow implements WindowListener {
 
 	@Override
 	public void windowClosed(WindowEvent e) {
+		s_logger.debug("EVENT {}", e);
 		populateComponentsFromSettings();
 	}
 

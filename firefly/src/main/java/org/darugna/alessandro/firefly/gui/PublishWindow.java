@@ -14,6 +14,8 @@ import java.awt.Insets;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JRadioButton;
 import javax.swing.BoxLayout;
+import java.awt.FlowLayout;
+import javax.swing.JScrollPane;
 
 public class PublishWindow extends JFrame {
 
@@ -23,7 +25,7 @@ public class PublishWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public PublishWindow() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -48,7 +50,7 @@ public class PublishWindow extends JFrame {
 		JPanel panel_1 = new JPanel();
 		contentPane.add(panel_1, BorderLayout.SOUTH);
 		
-		JComboBox comboBox = new JComboBox();
+		JComboBox<String> comboBox = new JComboBox<String>();
 		panel_1.add(comboBox);
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"0", "1", "2"}));
 		
@@ -56,7 +58,9 @@ public class PublishWindow extends JFrame {
 		panel_1.add(btnNewButton);
 		
 		PublishPanelKura ppk = new PublishPanelKura();
-		contentPane.add(ppk, BorderLayout.CENTER);
+		JScrollPane scrollPane = new JScrollPane(ppk);
+
+		contentPane.add(scrollPane, BorderLayout.CENTER);
 	}
 
 }
