@@ -9,25 +9,30 @@ public class PublishPanelKura extends JTable {
 	/**
 	 * Create the panel.
 	 */
-	public PublishPanelKura() {
+	public PublishPanelKura() implements TableModelLister {
 		super();
 		setFillsViewportHeight(true);
-		setModel(new DefaultTableModel(
-			new Object[][] {
-				{null, null, null},
-				{null, null, null},
-			},
-			new String[] {
-				"Metric", "Type", "Value"
-			}
-		) {
-			Class[] columnTypes = new Class[] {
-				String.class, Class.class, String.class
-			};
-			public Class getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-		});
+		
+		DefaultTableModel kuraTableModel = new DefaultTableModel(
+				new Object[][] {
+						{null, null, null},
+						{null, null, null},
+					},
+					new String[] {
+						"Metric", "Type", "Value"
+					}
+				) {
+					final Class[] columnTypes = new Class[] {
+						String.class, Class.class, String.class
+					};
+					public Class getColumnClass(int columnIndex) {
+						return columnTypes[columnIndex];
+					};
+					 
+				};
+		
+		setModel(kuraTableModel);
+		kuraTableModel.addTableModelListener(this);
 		
 		setDefaultEditor(Class.class,
 				new ComboboxCellEditor<Class>(new Class[]{String.class, Integer.class, Float.class, Double.class}));

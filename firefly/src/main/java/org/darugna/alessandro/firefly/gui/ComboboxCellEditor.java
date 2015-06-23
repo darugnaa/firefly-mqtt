@@ -12,13 +12,14 @@ import javax.swing.table.TableCellEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("serial")
 public class ComboboxCellEditor<T> extends AbstractCellEditor
 				implements TableCellEditor, ActionListener {
 	
 	private static Logger s_logger = LoggerFactory.getLogger(ComboboxCellEditor.class);
 	
-	private T selection;
-	private T[] availableValues;
+	private T selection = null;
+	private final T[] availableValues;
 	
 	public ComboboxCellEditor(T[] availableValues) {
 		this.availableValues = availableValues;

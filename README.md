@@ -51,3 +51,6 @@ The project is compiled and packed using [Maven 3.0.5](https://maven.apache.org/
 
 ## Libraries
 A complete list of libraries used in this project can be found [in the pom.xml](https://github.com/darugnaa/firefly-mqtt/blob/master/firefly/pom.xml#L31). I included in my sources the classes from [Eclipse Kura source code](https://github.com/eclipse/kura) required to decode Kura payloads.
+
+## Useful resources
+http://www.codejava.net/java-se/swing/how-to-create-jcombobox-cell-editor-for-jtable
