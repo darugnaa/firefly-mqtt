@@ -1,15 +1,25 @@
 package org.darugna.alessandro.firefly.gui;
 
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class PublishPanelKura extends JTable {
 
+    private static Logger s_logger = LoggerFactory.getLogger(PublishPanelKura.class);
+    
+    private final DefaultCellEditor comboBoxTypesCellEditor;
+
 	/**
 	 * Create the panel.
 	 */
-	public PublishPanelKura() implements TableModelLister {
+	public PublishPanelKura() {
 		super();
 		setFillsViewportHeight(true);
 		
@@ -34,8 +44,24 @@ public class PublishPanelKura extends JTable {
 		setModel(kuraTableModel);
 		kuraTableModel.addTableModelListener(this);
 		
-		setDefaultEditor(Class.class,
-				new ComboboxCellEditor<Class>(new Class[]{String.class, Integer.class, Float.class, Double.class}));
+        final JComboBox<String> comboBox = new JComboBox<>();
+        comboBox.addItem("");
+        comboBox.addItem("String");
+        comboBox.addItem("Integer");
+        comboBox.addItem("Boolean");
+        comboBox.addItem("Float");
+        comboBoxTypesCellEditor = new DefaultCellEditor(comboBox);
+
+	}
+	
+	public TableCellEditor getCellEditor(int row, int column) {
+        s_logger.debug("getCellEditor({},{})", row, column);
+        if (column == 1) {
+            return comboBoxTypesCellEditor;
+        } else {
+            return super.getCellEditor(row, column);
+        }
+
 	}
 
 }
