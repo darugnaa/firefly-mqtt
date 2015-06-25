@@ -3,6 +3,8 @@ package org.darugna.alessandro.firefly.gui;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 
@@ -15,6 +17,7 @@ public class PublishPanelKura extends JTable {
     private static Logger s_logger = LoggerFactory.getLogger(PublishPanelKura.class);
     
     private final DefaultCellEditor comboBoxTypesCellEditor;
+    private final KuraPayloadTableModel kuraPayloadTableModel;
 
 	/**
 	 * Create the panel.
@@ -23,26 +26,8 @@ public class PublishPanelKura extends JTable {
 		super();
 		setFillsViewportHeight(true);
 		
-		DefaultTableModel kuraTableModel = new DefaultTableModel(
-				new Object[][] {
-						{null, null, null},
-						{null, null, null},
-					},
-					new String[] {
-						"Metric", "Type", "Value"
-					}
-				) {
-					final Class[] columnTypes = new Class[] {
-						String.class, Class.class, String.class
-					};
-					public Class getColumnClass(int columnIndex) {
-						return columnTypes[columnIndex];
-					};
-					 
-				};
-		
-		setModel(kuraTableModel);
-		kuraTableModel.addTableModelListener(this);
+		kuraPayloadTableModel = new KuraPayloadTableModel();
+		setModel(kuraPayloadTableModel);
 		
         final JComboBox<String> comboBox = new JComboBox<>();
         comboBox.addItem("");
@@ -62,6 +47,15 @@ public class PublishPanelKura extends JTable {
             return super.getCellEditor(row, column);
         }
 
+	}
+	
+	@Override
+	public void editingStopped(ChangeEvent e) {
+		super.editingStopped(e);
+		s_logger.debug("Editing stopped}");
+		if (!kuraPayloadTableModel.hasEmptyRow()) {
+			kuraPayloadTableModel.addEmptyRow();
+		}
 	}
 
 }
