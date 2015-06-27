@@ -4,6 +4,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -50,6 +51,18 @@ public class PublishPanelKura extends JTable {
 	}
 	
 	@Override
+	public void tableChanged(javax.swing.event.TableModelEvent e) {
+		super.tableChanged(e);
+		s_logger.debug("tableChanged");
+		if (e.getType() == TableModelEvent.UPDATE && e.getFirstRow() >= 0) {
+			if (kuraPayloadTableModel.hasEmptyRow()) {
+				kuraPayloadTableModel.addEmptyRow();
+			}
+		}
+	};
+	
+	/*
+	@Override
 	public void editingStopped(ChangeEvent e) {
 		super.editingStopped(e);
 		s_logger.debug("Editing stopped}");
@@ -57,5 +70,6 @@ public class PublishPanelKura extends JTable {
 			kuraPayloadTableModel.addEmptyRow();
 		}
 	}
+	*/
 
 }

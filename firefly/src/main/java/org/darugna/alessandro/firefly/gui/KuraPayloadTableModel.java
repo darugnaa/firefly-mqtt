@@ -27,21 +27,19 @@ public class KuraPayloadTableModel extends DefaultTableModel {
 	
 	public boolean hasEmptyRow() {
         if (dataVector.size() == 0) return false;
-        Object dataRow = dataVector.get(dataVector.size() - 1);
-        s_logger.debug("DATAROW: {}", dataRow);
-//        if (dataRow.elementAt(0) != null &&
-//        		dataRow.elementAt(1) != null &&
-//        		dataRow.elementAt(2) != null )
-//        {
-//           return true;
-//        }
-//        else return false;
-        
-        return false;
+        Vector dataRow = (Vector) dataVector.get(dataVector.size() - 1);
+        s_logger.debug("DATAROW {}: {}", dataRow.getClass(), dataRow);
+        if (dataRow.elementAt(0) != null &&
+        		dataRow.elementAt(1) != null &&
+        		dataRow.elementAt(2) != null )
+        {
+           return true;
+        }
+        else return false;
     }
 
     public void addEmptyRow() {
-        dataVector.add(new String[]{null, null, null});
+    	addRow((Vector)null);
     }
 
 }
